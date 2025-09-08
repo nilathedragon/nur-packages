@@ -14,7 +14,15 @@
   modules = import ./modules; # NixOS modules
   overlays = import ./overlays; # nixpkgs overlays
 
-  example-package = pkgs.callPackage ./pkgs/example-package { };
+  # example-package = pkgs.callPackage ./pkgs/example-package { };
   # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
   # ...
+
+  frida-dexdump = pkgs.python3.pkgs.callPackage ./pkgs/frida-dexdump { };
+
+  python3Packages = let
+    callPackage = pkgs.python3.pkgs.callPackage;
+  in {
+    wallbreaker = callPackage ./pkgs/python-packages/wallbreaker { };
+  };
 }
