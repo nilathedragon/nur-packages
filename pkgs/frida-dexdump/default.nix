@@ -36,5 +36,6 @@ buildPythonApplication rec {
     license = lib.licenses.gpl3Only;
     homepage = "https://github.com/hluwa/frida-dexdump";
     changelog = "https://github.com/hluwa/frida-dexdump/releases/tag/${version}";
+    mainProgram = "frida-dexdump";
   };
 }
