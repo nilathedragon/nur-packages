@@ -39,6 +39,5 @@ buildPythonPackage rec {
     license = lib.licenses.gpl3Only;
     homepage = "https://github.com/hluwa/Wallbreaker";
     changelog = "https://github.com/hluwa/Wallbreaker/releases/tag/${version}";
-    maintainers = with lib.maintainers; [ nilathedragon ];
   };
 }
