@@ -1,14 +1,40 @@
 {
   description = "My personal NUR repository";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  outputs = { self, nixpkgs }:
-    let
-      forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
-    in
-    {
-      legacyPackages = forAllSystems (system: import ./default.nix {
-        pkgs = import nixpkgs { inherit system; };
-      });
-      packages = forAllSystems (system: nixpkgs.lib.filterAttrs (_: v: nixpkgs.lib.isDerivation v) self.legacyPackages.${system});
+
+  inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  };
+
+  outputs = inputs@{ self, flake-parts, nixpkgs, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = nixpkgs.lib.systems.flakeExposed;
+
+      imports = [
+        (
+          { inputs, ... }: {
+            perSystem = { system, ... }: {
+              _module.args = {
+                pkgs = import inputs.nixpkgs { inherit system; };
+              };
+            };
+          }
+        )
+      ];
+
+      flake = {
+        nixosModules = {
+          default = { config, pkgs, ... }: {
+            nixpkgs.overlays = [ self.overlays.default ];
+          };
+        };
+        overlays = {
+          default = final: prev: ((import ./default.nix { pkgs = prev; }).overlays.default final prev);
+        };
+      };
+      
+      perSystem = { pkgs, system, ... }: {
+        packages = import ./default.nix {inherit pkgs;};
+      };
     };
 }

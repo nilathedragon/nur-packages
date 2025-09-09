@@ -6,23 +6,39 @@
 # commands such as:
 #     nix-build -A mypackage
 
-{ pkgs ? import <nixpkgs> { } }:
+{ pkgs ? import <nixpkgs> { } }: let
+  # pkgsFolder = ./pkgs;
+  # entries = builtins.readDir pkgsFolder;
 
+  # flakePackages = 
+  #   builtins.listToAttrs
+  #   (
+  #     builtins.filter (x: x != null)
+  #     (
+  #       map (
+  #         name: if entries.${name} == "directory" && builtins.pathExists (pkgsFolder + "/${name}/default.nix") then {
+  #           inherit name;
+  #           value = pkgs.callPackage (pkgsFolder + "/${name}") {};
+  #         } else null
+  #       )
+  #       (
+  #         builtins.attrNames entries
+  #       )
+  #     )
+  #   );
+  flakePackages = {
+    frida-dexdump = pkgs.python3.pkgs.callPackage ./pkgs/frida-dexdump { };
+  };
+in
 {
   # The `lib`, `modules`, and `overlays` names are special
   lib = import ./lib { inherit pkgs; }; # functions
   modules = import ./modules; # NixOS modules
-  overlays = import ./overlays; # nixpkgs overlays
-
-  # example-package = pkgs.callPackage ./pkgs/example-package { };
-  # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
-  # ...
-
-  frida-dexdump = pkgs.python3.pkgs.callPackage ./pkgs/frida-dexdump { };
+  overlays = import ./overlays { inherit flakePackages; }; # nixpkgs overlays
 
   python3Packages = let
     callPackage = pkgs.python3.pkgs.callPackage;
-  in {
+  in pkgs.recurseIntoAttrs {
     wallbreaker = callPackage ./pkgs/python-packages/wallbreaker { };
   };
-}
+} // flakePackages

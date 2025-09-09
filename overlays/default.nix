@@ -1,5 +1,5 @@
+{ flakePackages }:
+
 {
-  # Add your overlays here
-  #
-  # my-overlay = import ./my-overlay;
+  default = final: prev: flakePackages;
 }
