@@ -6,7 +6,10 @@
 
   click,
   frida-tools,
-  wallbreaker ? (callPackage ../python-packages/wallbreaker { }),
+  frida-python,
+  wallbreaker ? (callPackage ../python-packages/wallbreaker {
+    frida-python = frida-python;
+   }),
 }:
 
 buildPythonApplication rec {
